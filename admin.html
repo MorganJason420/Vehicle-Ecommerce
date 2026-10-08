@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0d1010">
+  <title>Control Center | MOTORVAULT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="js/data.js" defer></script>
+  <script src="admin.js" defer></script>
+</head>
+<body class="admin-page" data-admin-page="dashboard">
+  <div class="admin-app" id="admin-app">
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <a class="admin-brand" href="index.html"><span class="brand-emblem">M</span><span>MOTOR<span>VAULT</span></span></a>
+      <div class="sidebar-workspace"><span class="workspace-label">WORKSPACE</span><span class="workspace-name"><i></i> Marketplace HQ <b>⌄</b></span></div>
+      <nav class="admin-nav" aria-label="Admin sections">
+        <span class="nav-group-label">OVERVIEW</span>
+        <button class="admin-nav-item is-active" data-admin-section="dashboard"><span>◫</span>Dashboard</button>
+        <button class="admin-nav-item" data-admin-section="analytics"><span>⌁</span>Analytics</button>
+        <span class="nav-group-label">OPERATIONS</span>
+        <button class="admin-nav-item" data-admin-section="vehicles"><span>▱</span>Vehicles <b data-nav-vehicles>20</b></button>
+        <button class="admin-nav-item" data-admin-section="inventory"><span>◧</span>Inventory</button>
+        <button class="admin-nav-item" data-admin-section="orders"><span>⇄</span>Orders <b data-nav-orders>0</b></button>
+        <button class="admin-nav-item" data-admin-section="customers"><span>♙</span>Customers</button>
+        <button class="admin-nav-item" data-admin-section="leads"><span>⌑</span>Leads <b data-nav-leads>0</b></button>
+        <span class="nav-group-label">STOREFRONT</span>
+        <button class="admin-nav-item" data-admin-section="promotions"><span>✳</span>Promotions</button>
+        <button class="admin-nav-item" data-admin-section="homepage"><span>⌂</span>Homepage Builder</button>
+        <button class="admin-nav-item" data-admin-section="content"><span>▤</span>Content</button>
+        <button class="admin-nav-item" data-admin-section="reviews"><span>☆</span>Reviews</button>
+        <span class="nav-group-label">SYSTEM</span>
+        <button class="admin-nav-item" data-admin-section="notifications"><span>♧</span>Notifications <b data-nav-notifications>2</b></button>
+        <button class="admin-nav-item" data-admin-section="settings"><span>⚙</span>Settings</button>
+      </nav>
+      <div class="sidebar-bottom"><div class="admin-profile"><span class="admin-avatar">A</span><span><strong>Alex Morgan</strong><small>Administrator</small></span><button class="profile-more" aria-label="Profile options">···</button></div><div class="sidebar-actions"><button data-theme-toggle><span>◐</span>Appearance <b>Dark</b></button><button data-logout><span>↪</span>Sign out</button></div><div class="sidebar-demo">MOTORVAULT DEMO <span>v1.0</span></div></div>
+    </aside>
+    <div class="admin-main">
+      <header class="admin-topbar"><button class="mobile-sidebar-toggle" aria-label="Toggle navigation" data-sidebar-toggle>☰</button><div class="topbar-breadcrumb"><span>MotorVault</span><i>/</i><strong data-current-section>Dashboard</strong></div><time class="topbar-clock" data-admin-clock aria-label="Current local time"></time><div class="topbar-actions"><label class="admin-search"><span>⌕</span><input type="search" placeholder="Search anything…" aria-label="Search dashboard" data-global-search><kbd>⌘ K</kbd></label><button class="topbar-icon" aria-label="Notifications" data-open-section="notifications">♧<i class="notification-dot"></i></button><button class="admin-primary quick-add" data-quick-add><span>＋</span> Quick add</button><a class="preview-link" href="index.html" target="_blank" rel="noopener">View website <span>↗</span></a><span class="admin-avatar top-avatar">A</span></div></header>
+      <main class="admin-content" id="admin-content" tabindex="-1"></main>
+    </div>
+  </div>
+  <div id="admin-modal-root"></div>
+  <div id="admin-toast" class="admin-toast" role="status" aria-live="polite"></div>
+</body>
+</html>
