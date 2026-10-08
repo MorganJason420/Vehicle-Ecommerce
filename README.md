@@ -1,8 +1,8 @@
 # MOTORVAULT
 
-A static vehicle marketplace demo built with HTML, CSS, and vanilla JavaScript. Open `index.html` directly or serve the folder with VS Code Live Server.
+A static vehicle marketplace built with HTML, CSS, and vanilla JavaScript. Open `index.html` directly or serve the folder with VS Code Live Server.
 
-## Demo flows
+## preview flows
 
 - Browse, search, sort, and filter the local sample inventory.
 - Save favorites and compare up to four vehicles.

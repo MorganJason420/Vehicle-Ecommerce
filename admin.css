@@ -64,8 +64,8 @@ input, select, textarea { min-width: 0; color: var(--ad-text); }
 .login-caption b { color: var(--ad-red); }
 .login-panel { display: flex; flex-direction: column; justify-content: space-between; padding: 34px clamp(28px, 5vw, 72px) 20px; background: radial-gradient(ellipse at 80% 0%, #27302c44, transparent 45%), #111515; }
 .login-panel-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.demo-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 8px; border: 1px solid #586146; border-radius: 2px; color: #cad6a5; font-size: 8px; font-weight: 700; letter-spacing: .7px; }
-.demo-pill i { width: 5px; height: 5px; border-radius: 50%; background: #b2cf72; }
+.preview-pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 8px; border: 1px solid #586146; border-radius: 2px; color: #cad6a5; font-size: 8px; font-weight: 700; letter-spacing: .7px; }
+.preview-pill i { width: 5px; height: 5px; border-radius: 50%; background: #b2cf72; }
 .login-form-wrap { width: min(100%, 390px); align-self: center; padding-block: 50px; }
 .login-mobile-brand { display: none; align-items: center; gap: 10px; margin-bottom: 43px; font: 800 13px var(--ad-display); letter-spacing: 1px; }
 .login-mobile-brand > span:last-child > span { color: var(--ad-muted); font-weight: 500; }
@@ -123,8 +123,8 @@ input, select, textarea { min-width: 0; color: var(--ad-text); }
 .sidebar-actions button > span { font-size: 13px; }
 .sidebar-actions button > b { margin-left: auto; color: #d2dbd3; font-size: 8px; }
 .sidebar-actions button:hover { border-color: var(--ad-line-2); color: white; }
-.sidebar-demo { display: flex; justify-content: space-between; margin-top: 11px; color: #59645e; font-size: 7px; font-weight: 700; letter-spacing: 1px; }
-.sidebar-demo span { color: #758078; font-weight: 400; letter-spacing: 0; }
+.sidebar-preview { display: flex; justify-content: space-between; margin-top: 11px; color: #59645e; font-size: 7px; font-weight: 700; letter-spacing: 1px; }
+.sidebar-preview span { color: #758078; font-weight: 400; letter-spacing: 0; }
 .admin-main { min-height: 100vh; margin-left: 236px; }
 .admin-topbar { position: sticky; z-index: 20; top: 0; display: flex; height: 62px; align-items: center; justify-content: space-between; gap: 14px; padding: 0 27px; border-bottom: 1px solid var(--ad-line); background: rgba(13,16,16,.91); backdrop-filter: blur(18px); }
 .topbar-breadcrumb { display: flex; align-items: center; gap: 9px; white-space: nowrap; color: var(--ad-dim); font-size: 10px; }
