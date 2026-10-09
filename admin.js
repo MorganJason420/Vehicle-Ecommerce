@@ -65,11 +65,11 @@
   }
 
   let session = validSession();
-  if (!session) { location.replace("admin-login.html"); return; }
+  if (!session) { location.replace("/admin"); return; }
   const logout = () => {
     localStorage.removeItem(AUTH);
     sessionStorage.removeItem(TEMP_AUTH);
-    location.replace("admin-login.html");
+    location.replace("/admin");
   };
   let lastTouch = 0;
   document.addEventListener("pointerdown", () => {

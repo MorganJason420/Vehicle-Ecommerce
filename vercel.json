@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/admin-login.html",
+      "destination": "/admin",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/admin-login.html"
+    }
+  ]
+}
