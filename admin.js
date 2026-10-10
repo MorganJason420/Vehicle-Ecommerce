@@ -127,6 +127,29 @@
     { id: "CUS-103", name: "Samir Patel", email: "samir.patel@example.test", city: "Chicago, IL", orders: 1, total: 62400, joined: "2026-03-28" },
     { id: "CUS-104", name: "Avery Chen", email: "avery.chen@example.test", city: "Seattle, WA", orders: 0, total: 0, joined: "2026-04-18" }
   ]);
+  const permissionOptions = [
+    ["dashboard", "View dashboard"],
+    ["vehicles", "Manage vehicles"],
+    ["orders", "Manage orders"],
+    ["customers", "Manage customers"],
+    ["leads", "Manage leads"],
+    ["storefront", "Manage storefront content"],
+    ["settings", "Manage workspace settings"]
+  ];
+  const allPermissions = permissionOptions.map(([id]) => id);
+  const defaultRoles = [
+    { id: "role-admin", name: "Administrator", permissions: allPermissions },
+    { id: "role-inventory", name: "Inventory Manager", permissions: ["dashboard", "vehicles"] },
+    { id: "role-sales", name: "Sales Manager", permissions: ["dashboard", "orders", "customers", "leads"] },
+    { id: "role-content", name: "Content Editor", permissions: ["dashboard", "storefront"] },
+    { id: "role-support", name: "Support Agent", permissions: ["dashboard", "customers", "leads", "orders"] }
+  ];
+  let roles = read("admin-roles", defaultRoles);
+  if (!Array.isArray(roles) || !roles.some(role => role.id === "role-admin")) roles = defaultRoles;
+  let users = read("admin-users", [
+    { id: "user-admin", name: "Alex Morgan", email: "alex@motorvault.example", roleId: "role-admin", createdAt: new Date().toISOString(), isCurrent: true }
+  ]);
+  if (!Array.isArray(users)) users = [];
   if (!read("customers", null)) write("customers", customers);
   let reviews = read("reviews", [
     { id: "RV-51", name: "Jordan E.", rating: 5, vehicle: "2022 BMW M4 Competition", text: "Clear information and a calmer way to compare cars.", date: "2026-04-12", status: "Published" },
@@ -327,9 +350,25 @@
   function notificationsPage() {
     content.innerHTML = `${head("SYSTEM MESSAGES", "Notifications", "Internal alerts and marketplace announcements.", `<button class="admin-primary" data-action="notification">＋ Send notification</button>`)}<div class="admin-panel"><div class="panel-heading"><div><span class="panel-kicker">ADMIN INBOX</span><h2>${notifications.filter(n => !n.read).length} unread notifications</h2></div><button class="admin-quiet" data-mark-read>Mark all read</button></div>${notifications.map(n => `<div class="notification-row ${n.read ? "" : "unread"}"><span class="notification-mark">♧</span><div><p><strong>${safe(n.title)}</strong> — ${safe(n.body)}</p><small>${ago(n.createdAt)}</small></div><button class="row-action" data-delete-notification="${safe(n.id)}">×</button></div>`).join("")}</div>`;
   }
+  function userForm() {
+    openModal("Add team member", "Add a demo user and assign a workspace role.", `<form class="admin-form" id="user-form"><div class="admin-form-grid"><label>Name<input name="name" autocomplete="off" required></label><label>Email<input name="email" type="email" autocomplete="off" required></label><label>Role<select name="roleId" required>${roles.map(role => `<option value="${safe(role.id)}">${safe(role.name)}</option>`).join("")}</select></label></div><p class="form-note">This creates a local demo record only. It does not send an invitation or create a sign-in account.</p><div class="admin-modal-actions"><button type="button" class="admin-secondary" data-close-modal>Cancel</button><button class="admin-primary">Add user</button></div></form>`, true);
+  }
+  function roleForm(role = null) {
+    const selected = role?.permissions || [];
+    openModal(role ? "Edit role" : "Create role", "Choose a name and the areas this demo role represents.", `<form class="admin-form" id="role-form" ${role ? `data-id="${safe(role.id)}"` : ""}><label>Role name<input name="name" value="${safe(role?.name || "")}" maxlength="40" required></label><span class="panel-kicker">PERMISSIONS</span><div class="role-permission-options">${permissionOptions.map(([id, label]) => `<label><input type="checkbox" name="permissions" value="${safe(id)}" ${selected.includes(id) ? "checked" : ""}><span>${safe(label)}</span></label>`).join("")}</div><p class="form-note">Permissions are descriptive demo settings; they do not restrict access in this browser-only app.</p><div class="admin-modal-actions"><button type="button" class="admin-secondary" data-close-modal>Cancel</button><button class="admin-primary">Save role</button></div></form>`, true);
+  }
   function settingsPage() {
     const settings = read("admin-settings", { name: "Alex Morgan", email: "alex@motorvault.example", timeout: "30" });
-    content.innerHTML = `${head("CONTROL CENTER", "Settings", "Configure your administrator workspace.")}<div class="editor-layout"><form class="editor-section" id="settings-form"><span class="panel-kicker">ADMIN PROFILE</span><h2>Workspace preferences</h2><label class="setting-field">Display name<input name="name" value="${safe(settings.name)}"></label><label class="setting-field">Email<input name="email" type="email" value="${safe(settings.email)}"></label><label class="setting-field">Session timeout<select name="timeout"><option value="30">30 minutes</option><option value="60" ${settings.timeout === "60" ? "selected" : ""}>1 hour</option></select></label><button class="admin-primary">Save preferences</button></form><section class="editor-section"><span class="panel-kicker">preview DATA</span><h2>Browser storage</h2><p>Inventory, reservations, inquiries, and preferences stay in this browser only. preview authentication is not production security.</p><button class="admin-danger" data-reset-preview>Reset workspace data</button></section></div>`;
+    const userRows = users.map(user => {
+      const role = roles.find(item => item.id === user.roleId);
+      return `<tr><td>${safe(user.name)}${user.isCurrent ? ' <span class="neutral-badge">Current demo user</span>' : ""}</td><td>${safe(user.email)}</td><td><select class="inline-status" data-user-role="${safe(user.id)}" aria-label="Role for ${safe(user.name)}" ${user.isCurrent ? "disabled" : ""}>${roles.map(item => `<option value="${safe(item.id)}" ${item.id === user.roleId ? "selected" : ""}>${safe(item.name)}</option>`).join("")}</select></td><td>${stamp(user.createdAt)}</td><td>${user.isCurrent ? "" : `<button class="row-action" data-delete-user="${safe(user.id)}" aria-label="Remove ${safe(user.name)}">×</button>`}</td></tr>`;
+    }).join("");
+    const roleCards = roles.map(role => {
+      const assigned = users.filter(user => user.roleId === role.id).length;
+      const permissionNames = permissionOptions.filter(([id]) => role.permissions.includes(id)).map(([, label]) => label);
+      return `<article class="entity-card"><div class="panel-heading"><span class="featured-badge">${safe(role.name)}</span><div class="row-actions">${role.id === "role-admin" ? "" : `<button class="row-action" data-edit-role="${safe(role.id)}" aria-label="Edit ${safe(role.name)}">✎</button><button class="row-action" data-delete-role="${safe(role.id)}" aria-label="Delete ${safe(role.name)}">×</button>`}</div></div><p>${permissionNames.length ? permissionNames.map(safe).join(" · ") : "No areas selected"}</p><div class="entity-meta"><span>${assigned} assigned ${assigned === 1 ? "user" : "users"}</span><span>${role.id === "role-admin" ? "Protected role" : "Demo role"}</span></div></article>`;
+    }).join("");
+    content.innerHTML = `${head("CONTROL CENTER", "Settings", "Configure your administrator workspace.")}<div class="editor-layout"><form class="editor-section" id="settings-form"><span class="panel-kicker">ADMIN PROFILE</span><h2>Workspace preferences</h2><label class="setting-field">Display name<input name="name" value="${safe(settings.name)}"></label><label class="setting-field">Email<input name="email" type="email" value="${safe(settings.email)}"></label><label class="setting-field">Session timeout<select name="timeout"><option value="30">30 minutes</option><option value="60" ${settings.timeout === "60" ? "selected" : ""}>1 hour</option></select></label><button class="admin-primary">Save preferences</button></form><section class="editor-section"><span class="panel-kicker">DEMO DATA</span><h2>Browser storage</h2><p>Users, roles, and workspace data are saved in this browser only. Demo users cannot sign in, and role permissions are not enforced.</p><button class="admin-danger" data-reset-preview>Reset workspace data</button></section></div><section class="editor-section access-management"><div class="access-heading"><div><span class="panel-kicker">TEAM ACCESS · DEMO ONLY</span><h2>Users</h2><p>Add demo user records and assign them a role.</p></div><button class="admin-primary" data-add-user>＋ Add user</button></div><div class="admin-table-wrap"><table class="admin-table access-user-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Added</th><th>Action</th></tr></thead><tbody>${userRows || '<tr><td colspan="5" class="empty-table">No users added yet.</td></tr>'}</tbody></table></div></section><section class="editor-section access-management"><div class="access-heading"><div><span class="panel-kicker">ROLE CATALOG · DEMO ONLY</span><h2>Roles</h2><p>Choose from common roles or create a custom role with descriptive permissions.</p></div><button class="admin-secondary" data-add-role>＋ Add role</button></div><div class="entity-grid">${roleCards}</div></section>`;
   }
   function renderSection(section) {
     state.section = section;
@@ -421,12 +460,34 @@
     const togglePromo = event.target.closest("[data-toggle-promo]"); if (togglePromo) { const p = promotions.find(item => item.id === togglePromo.dataset.togglePromo); p.active = !p.active; write("promotions", promotions); return renderSection("promotions"); }
     const editPromo = event.target.closest("[data-edit-promo]"); if (editPromo) return promotionForm(promotions.find(item => item.id === editPromo.dataset.editPromo));
     const deletePromo = event.target.closest("[data-delete-promo]"); if (deletePromo && confirm("Delete this promotion?")) { promotions = promotions.filter(item => item.id !== deletePromo.dataset.deletePromo); write("promotions", promotions); return renderSection("promotions"); }
+    if (event.target.closest("[data-add-user]")) return userForm();
+    if (event.target.closest("[data-add-role]")) return roleForm();
+    const editRole = event.target.closest("[data-edit-role]");
+    if (editRole) return roleForm(roles.find(role => role.id === editRole.dataset.editRole));
+    const deleteUser = event.target.closest("[data-delete-user]");
+    if (deleteUser && confirm("Remove this demo user?")) {
+      users = users.filter(user => user.id !== deleteUser.dataset.deleteUser);
+      write("admin-users", users);
+      toast("Demo user removed.");
+      return renderSection("settings");
+    }
+    const deleteRole = event.target.closest("[data-delete-role]");
+    if (deleteRole) {
+      const role = roles.find(item => item.id === deleteRole.dataset.deleteRole);
+      if (!role || role.id === "role-admin") return;
+      if (users.some(user => user.roleId === role.id)) return toast("Reassign users before deleting this role.");
+      if (!confirm(`Delete the ${role.name} role?`)) return;
+      roles = roles.filter(item => item.id !== role.id);
+      write("admin-roles", roles);
+      toast("Role deleted.");
+      return renderSection("settings");
+    }
     const delLead = event.target.closest("[data-delete-lead]"); if (delLead && confirm("Remove this lead?")) { leads = leads.filter(item => item.id !== delLead.dataset.deleteLead); write("leads", leads); updateCounts(); return renderSection("leads"); }
     const delReview = event.target.closest("[data-delete-review]"); if (delReview && confirm("Delete this review?")) { reviews = reviews.filter(item => item.id !== delReview.dataset.deleteReview); write("reviews", reviews); return renderSection("reviews"); }
     const delNotification = event.target.closest("[data-delete-notification]"); if (delNotification) { notifications = notifications.filter(item => item.id !== delNotification.dataset.deleteNotification); write("admin-notifications", notifications); updateCounts(); return renderSection("notifications"); }
     if (event.target.closest("[data-mark-read]")) { notifications = notifications.map(n => ({ ...n, read: true })); write("admin-notifications", notifications); updateCounts(); return renderSection("notifications"); }
     const exportButton = event.target.closest("[data-export]"); if (exportButton) { const tables = { vehicles: [inventory, "motorvault-inventory.csv"], orders: [orders, "motorvault-orders.csv"], leads: [leads, "motorvault-leads.csv"], customers: [customers, "motorvault-customers.csv"] }; return downloadCsv(...tables[exportButton.dataset.export]); }
-    if (event.target.closest("[data-reset-preview]") && confirm("Reset local inventory and workspace settings in this browser?")) { ["inventory", "orders", "homepage", "customers", "leads", "promotions", "activity", "admin-notifications", "reviews", "site-copy"].forEach(k => localStorage.removeItem(storageKey(k))); location.reload(); }
+    if (event.target.closest("[data-reset-preview]") && confirm("Reset local inventory and workspace settings in this browser?")) { ["inventory", "orders", "homepage", "customers", "leads", "promotions", "activity", "admin-notifications", "reviews", "site-copy", "admin-users", "admin-roles"].forEach(k => localStorage.removeItem(storageKey(k))); location.reload(); }
     if (event.target.closest("[data-close-modal]") || event.target.matches("[data-modal-backdrop]")) closeModal();
   });
   document.addEventListener("change", event => {
@@ -436,6 +497,16 @@
     if (orderControl) { const order = orders.find(o => o.reference === orderControl.dataset.orderStatus); order.status = orderControl.value; write("orders", orders); if (["Completed", "Sold"].includes(order.status)) { const ids = new Set(order.items || []); inventory.forEach(v => { if (ids.has(v.id)) v.status = "Sold"; }); saveInventory("Order completed; vehicle marked sold."); } addActivity(`Order ${order.reference} moved to ${order.status}`, "⇄"); toast("Order status updated."); }
     const leadControl = event.target.closest("[data-lead-status]"); if (leadControl) { const lead = leads.find(l => l.id === leadControl.dataset.leadStatus); lead.status = leadControl.value; write("leads", leads); updateCounts(); toast("Lead status updated."); }
     const reviewControl = event.target.closest("[data-review-status]"); if (reviewControl) { const review = reviews.find(r => r.id === reviewControl.dataset.reviewStatus); review.status = reviewControl.value; write("reviews", reviews); toast("Review visibility updated."); }
+    const userRoleControl = event.target.closest("[data-user-role]");
+    if (userRoleControl) {
+      const user = users.find(item => item.id === userRoleControl.dataset.userRole);
+      if (user?.isCurrent) return;
+      if (!user || !roles.some(role => role.id === userRoleControl.value)) return;
+      user.roleId = userRoleControl.value;
+      write("admin-users", users);
+      toast("User role updated.");
+      renderSection("settings");
+    }
   });
   document.addEventListener("submit", event => {
     const form = event.target;
@@ -462,6 +533,37 @@
     if (form.matches("#review-form")) { event.preventDefault(); const values = Object.fromEntries(new FormData(form)); reviews.unshift({ ...values, id: `RV-${Date.now()}`, rating: Number(values.rating), status: "Pending", date: new Date().toISOString().slice(0, 10) }); write("reviews", reviews); closeModal(); return renderSection("reviews"); }
     if (form.matches("#content-form")) { event.preventDefault(); write("site-copy", Object.fromEntries(new FormData(form))); toast("Storefront copy saved."); return; }
     if (form.matches("#settings-form")) { event.preventDefault(); write("admin-settings", Object.fromEntries(new FormData(form))); toast("Workspace preferences saved."); }
+    if (form.matches("#user-form")) {
+      event.preventDefault();
+      const values = Object.fromEntries(new FormData(form));
+      const email = String(values.email).trim().toLowerCase();
+      if (users.some(user => String(user.email ?? "").toLowerCase() === email)) return toast("A user with that email already exists.");
+      if (!roles.some(role => role.id === values.roleId)) return toast("Choose a valid role for this user.");
+      users.unshift({ id: `user-${Date.now().toString(36)}`, name: String(values.name).trim(), email, roleId: values.roleId, createdAt: new Date().toISOString() });
+      write("admin-users", users);
+      closeModal();
+      renderSection("settings");
+      return toast("Demo user added.");
+    }
+    if (form.matches("#role-form")) {
+      event.preventDefault();
+      const values = Object.fromEntries(new FormData(form));
+      const id = form.dataset.id;
+      const name = String(values.name).trim();
+      const permissions = [...form.querySelectorAll('input[name="permissions"]:checked')].map(input => input.value);
+      if (roles.some(role => role.id !== id && role.name.toLowerCase() === name.toLowerCase())) return toast("A role with that name already exists.");
+      if (!permissions.length) return toast("Select at least one permission for this role.");
+      if (!id && name.toLowerCase() === "administrator") return toast("Administrator is a reserved role name.");
+      if (id) {
+        roles = roles.map(role => role.id === id ? { ...role, name, permissions } : role);
+      } else {
+        roles.push({ id: `role-${Date.now().toString(36)}`, name, permissions });
+      }
+      write("admin-roles", roles);
+      closeModal();
+      renderSection("settings");
+      return toast(id ? "Role updated." : "Role created.");
+    }
   });
   document.addEventListener("keydown", event => {
     if (event.key === "Escape" && modalRoot.innerHTML) closeModal();

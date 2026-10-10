@@ -331,6 +331,15 @@ input, select, textarea { min-width: 0; color: var(--ad-text); }
 .editor-section .setting-field { margin-bottom: 11px; }
 .setting-field input, .setting-field textarea { width: 100%; }
 .setting-field textarea { min-height: 75px; padding: 9px; resize: vertical; }
+.access-management { margin-top: 13px; }
+.access-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.access-heading h2 { margin-bottom: 4px; }
+.access-heading p { margin: 0; color: var(--ad-muted); font-size: 9px; }
+.admin-table.access-user-table { min-width: 650px; }
+.admin-form .form-note { margin: 11px 0 0; color: var(--ad-muted); font-size: 9px; line-height: 1.6; }
+.role-permission-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 8px; }
+.admin-form .role-permission-options label { display: flex; min-height: 34px; align-items: center; flex-direction: row; gap: 8px; padding: 7px 9px; border: 1px solid var(--ad-line); border-radius: 3px; background: #111616; color: var(--ad-muted); }
+.admin-form .role-permission-options input { flex: 0 0 auto; }
 .home-preview { position: sticky; top: 78px; overflow: hidden; min-height: 340px; border: 1px solid var(--ad-line-2); border-radius: 5px; background: #17201f; }
 .home-preview-image { position: absolute; inset: 0; background: linear-gradient(90deg,#090c0cce,#090c0c26), url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=82") center/cover; }
 .home-preview-content { position: relative; display: flex; min-height: 340px; align-items: start; flex-direction: column; justify-content: center; padding: 24px; }
@@ -443,6 +452,8 @@ input, select, textarea { min-width: 0; color: var(--ad-text); }
   .section-toolbar .admin-primary, .section-toolbar .admin-secondary { min-height: 32px; }
   .summary-strip { grid-template-columns: repeat(2, 1fr); }
   .entity-grid { grid-template-columns: 1fr; }
+  .access-heading { align-items: start; flex-direction: column; }
+  .role-permission-options { grid-template-columns: 1fr; }
   .admin-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-form label.span-three { grid-column: 1 / -1; }
   .home-preview { position: relative; top: auto; min-height: 270px; }
